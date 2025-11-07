@@ -1,4 +1,4 @@
-name: Keep star-io site awake
+name: Keep star-io awake (main + staff)
 
 on:
   schedule:
@@ -8,9 +8,19 @@ on:
 jobs:
   ping:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Ping your site
+      - name: Ping both star-io endpoints
         run: |
-          URL=https://star-io-hc9c.onrender.com
-          echo "Pinging $URL at $(date -u)"
-          curl --max-time 20 --retry 2 --retry-delay 3 -s -o /dev/null -w "HTTP %{http_code}\n" "$URL"
+          # ここにアクセスしたいURLを追加
+          URLS=(
+            "https://star-io-hc9c.onrender.com"
+            "https://star-io-hc9c.onrender.com/staff/update-order-statuses"
+          )
+
+          echo "🔁 Start pinging at $(date -u)"
+          for URL in "${URLS[@]}"; do
+            echo "🌐 Pinging $URL ..."
+            STATUS=$(curl --max-time 20 --retry 2 --retry-delay 3 -s -o /dev/null -w "%{http_code}" "$URL")
+            echo "✅ Response: HTTP $STATUS"
+          done
